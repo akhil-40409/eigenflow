@@ -4,6 +4,7 @@ use rand::Rng;
 
 /// Quantum state for n qubits stored as 2^n complex amplitudes.
 /// Basis states are ordered in binary: |00⟩=0, |01⟩=1, |10⟩=2, |11⟩=3, etc.
+#[derive(Clone)]
 pub struct StateVector {
     pub num_qubits: usize,
     pub amplitudes: Vec<Complex>,
@@ -48,18 +49,18 @@ impl StateVector {
     pub fn apply_gate(&mut self, qubit: usize, gate: &Gate) {
         assert!(qubit < self.num_qubits, "qubit index out of range");
         let mask = 1 << (self.num_qubits - 1 - qubit);
-        let mut new_amps = self.amplitudes.clone();
 
+        // Each pair (i, j) is independent — no two pairs share an index — so we
+        // can read both values onto the stack and write back in-place without a clone.
         for i in 0..self.amplitudes.len() {
             if i & mask == 0 {
                 let j = i | mask;
-                let a0 = self.amplitudes[i];
+                let a0 = self.amplitudes[i]; // Complex is Copy, so these are stack copies
                 let a1 = self.amplitudes[j];
-                new_amps[i] = gate.matrix[0][0] * a0 + gate.matrix[0][1] * a1;
-                new_amps[j] = gate.matrix[1][0] * a0 + gate.matrix[1][1] * a1;
+                self.amplitudes[i] = gate.matrix[0][0] * a0 + gate.matrix[0][1] * a1;
+                self.amplitudes[j] = gate.matrix[1][0] * a0 + gate.matrix[1][1] * a1;
             }
         }
-        self.amplitudes = new_amps;
     }
 
     /// Apply gate U to `target` only when `control` qubit is |1⟩.
@@ -70,18 +71,16 @@ impl StateVector {
         assert_ne!(control, target, "control and target must be different qubits");
         let control_mask = 1 << (self.num_qubits - 1 - control);
         let target_mask  = 1 << (self.num_qubits - 1 - target);
-        let mut new_amps = self.amplitudes.clone();
 
         for i in 0..self.amplitudes.len() {
             if (i & control_mask != 0) && (i & target_mask == 0) {
                 let j = i | target_mask;
                 let a0 = self.amplitudes[i];
                 let a1 = self.amplitudes[j];
-                new_amps[i] = gate.matrix[0][0] * a0 + gate.matrix[0][1] * a1;
-                new_amps[j] = gate.matrix[1][0] * a0 + gate.matrix[1][1] * a1;
+                self.amplitudes[i] = gate.matrix[0][0] * a0 + gate.matrix[0][1] * a1;
+                self.amplitudes[j] = gate.matrix[1][0] * a0 + gate.matrix[1][1] * a1;
             }
         }
-        self.amplitudes = new_amps;
     }
 
     /// CNOT: flip target qubit when control qubit is |1⟩

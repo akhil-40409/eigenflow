@@ -18,9 +18,9 @@ impl Complex {
         Self { re: 1.0, im: 0.0 }
     }
 
-    /// |z|^2 = z * conj(z) = (a+ib)(a-ib) = a^2 + b^2
+    /// |z|^2 = a^2 + b^2
     pub fn norm_sq(&self) -> f64 {
-        (*self * self.conjugate()).re
+        self.re * self.re + self.im * self.im
     }
 
     pub fn norm(&self) -> f64 {
