@@ -34,10 +34,12 @@ impl Complex {
 
 impl std::fmt::Display for Complex {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        if self.im >= 0.0 {
-            write!(f, "{:.4}+{:.4}i", self.re, self.im)
-        } else {
+        // use im.is_sign_negative() instead of im < 0.0 so that -0.0 prints as "-0.0000i"
+        // rather than "+-0.0000i" (since -0.0 >= 0.0 is true in IEEE 754)
+        if self.im.is_sign_negative() {
             write!(f, "{:.4}{:.4}i", self.re, self.im)
+        } else {
+            write!(f, "{:.4}+{:.4}i", self.re, self.im)
         }
     }
 }

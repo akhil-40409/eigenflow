@@ -92,10 +92,8 @@ impl Circuit {
         }
     }
 
-    /// Print the circuit as a list of operations
     /// Run the circuit `shots` times from |0⟩, measure each run, and tally the results.
     /// Keys are the binary string of the outcome (e.g. "01", "11"), values are counts.
-    /// This is how you observe a quantum circuit statistically.
     pub fn sample(&self, shots: usize) -> HashMap<String, usize> {
         let mut counts = HashMap::new();
         for _ in 0..shots {

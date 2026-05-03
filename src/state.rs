@@ -140,6 +140,7 @@ impl StateVector {
 
         // renormalize: remaining amplitudes no longer sum to 1
         let norm: f64 = self.amplitudes.iter().map(|a| a.norm_sq()).sum::<f64>().sqrt();
+        assert!(norm > 1e-12, "measure_qubit: state collapsed to zero — input was not normalized");
         for amp in self.amplitudes.iter_mut() {
             amp.re /= norm;
             amp.im /= norm;
