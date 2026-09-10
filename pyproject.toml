@@ -1,0 +1,33 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "eigenflow"
+version = "0.1.0"
+description = "A personal lab of quantum ML paradigms."
+readme = "README.md"
+license = { file = "LICENSE" }
+requires-python = ">=3.11"
+authors = [{ name = "Akhil" }]
+dependencies = [
+    "pennylane>=0.45.0",
+    "pennylane-lightning>=0.45.0",
+    "pennylane-catalyst>=0.15.0",
+    "optax",
+    "scipy",
+]
+
+[project.optional-dependencies]
+dev = ["pytest"]
+plot = ["matplotlib"]
+
+[project.urls]
+Repository = "https://github.com/akhil-40409/eigenflow"
+
+[tool.setuptools.packages.find]
+include = ["eigenflow*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"
